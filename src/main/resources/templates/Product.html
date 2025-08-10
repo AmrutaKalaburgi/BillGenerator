@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body{
+        min-height: 100vh;
+           display: flex;
+     justify-content: center;
+     align-items: center;
+     background-color: #f8f9fa;
+       }
+       .card{
+
+       width:500px;
+       border-radius: 10px;
+       /* margin-top: 40px; */
+       display: flex;
+        justify-content: center;
+       align-items: center;
+        border: thick solid black;
+           padding: 20px;
+
+       }
+       .card-body{
+           font-weight:bold;
+           font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            width:100%;
+       }
+       .card-body label{
+           width: 100%;
+
+       }
+       .card-body input{
+           width:100%;
+       }
+       .container{
+             display: flex;
+             flex-direction: column;
+        justify-content: center;
+       align-items: center;
+       gap: 10px;
+       }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="text-center">BILL GENERATOR</h1>
+    <div class="card" >
+        <div class="card-body">
+            <form th:action="@{/product}" method="post" th:object="${product}">
+                <div id="pr">
+                    <label>Product</label></br>
+                    <input type="text" id="product" th:field="*{ProductName}"  placeholder="NAME" required></br></br>
+                </div>
+                <div>
+                    <label>Quantity</label></br>
+                    <input type="number" id="quantity" th:field="*{Quantity}" min="1" max="10" placeholder="QUANTITY" required></br></br>
+
+                </div>
+                <div>
+                    <label>Cost</label></br>
+                    <input type="number" id="amount" th:field="*{amount}"  placeholder="COST" required></br></br>
+
+                </div>
+
+
+
+
+                <!-- <button type="submit"><a href="bill.html>"></a> ADD PRODUCT</button></br><br> -->
+                <button type="submit" class="btn btn-primary">Add Product</button>
+            </form>
+        </div>
+    </div>
+    <table class="table table-bordered" id="billOutput">
+        <thead>
+        <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Cost</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody id="billTableBody">
+        <!-- Bill items will be added here -->
+        </tbody>
+    </table>
+<!--    <form action="/generate-bill" method="post">-->
+<!--        <button type="submit">Generate Bill</button>-->
+<!--    </form>-->
+    <form action="/AddBill" method="post">
+        <button type="submit" id="BillGen"  class="btn btn-primary">Bill Generator</button></form>
+</div>
+</body>
+<script>
+    let sum=0;
+    fetch('/productlist')
+        .then(response => response.json())
+        .then(data => {
+            const billTableBody = document.getElementById('billTableBody');
+            data.forEach(item => {
+                const row = document.createElement('tr');
+
+                item.total = item.amount
+                 sum += item.amount;
+
+                item.amount = item.amount/item.quantity;
+
+
+                row.innerHTML += `
+                    <td>${item.productName}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.amount}</td>
+                    <td>${item.total}</td>
+                `;
+
+
+                billTableBody.appendChild(row);
+                const existingSumRow = document.getElementById('sumRow');
+                if (existingSumRow) {
+                    existingSumRow.remove();
+                }
+                const totalRow = document.createElement('tr');
+                totalRow.id = 'sumRow';
+                totalRow.innerHTML = `
+                    <td colspan="3" class="text-end"><b>Total Bill</b></td>
+                    <td><b>${sum.toFixed(2)}</b></td>
+                `;
+                billTableBody.appendChild(totalRow);
+            });
+        })
+        .catch(error => console.error('Error fetching product list:', error));
+
+<!--   function generateBill() {-->
+
+<!--        fetch('/Bill', {-->
+<!--            method: 'POST',-->
+<!--            headers: {-->
+<!--                'Content-Type': 'application/json'-->
+<!--            },-->
+<!--            body: JSON.stringify({})-->
+<!--        })-->
+<!--        .then(response => response.json())-->
+<!--        .then(data => {-->
+<!--            console.log('Bill added successfully:', data);-->
+<!--            alert('Bill added successfully!');-->
+<!--        })-->
+<!--        .catch(error => console.error('Error generating bill:', error));-->
+<!--    }-->
+
+</script>
+</html>
